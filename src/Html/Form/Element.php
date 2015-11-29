@@ -40,12 +40,12 @@ class Element
     /**
      * @var bool
      */
-    private $errorsShowAll = false;
+    private $hideLabel = false;
 
     /**
      * @var bool
      */
-    private $hideLabel = false;
+    private $hideErrors = false;
 
     /**
      * @var string
@@ -288,6 +288,17 @@ class Element
     }
 
     /**
+     * Display fields errors
+     * @param bool $display
+     * @return $this
+     */
+    public function displayErrors($display = true)
+    {
+        $this->hideErrors = !$display;
+        return $this;
+    }
+
+    /**
      * Test if the field label is hidden
      * @return bool
      */
@@ -324,26 +335,6 @@ class Element
     public function render($part = 'all', $wrapper = 'div')
     {
         return static::html($this, $part, $wrapper);
-    }
-
-    /**
-     * Toggle this fields 'Show errors' status
-     * @param bool $show
-     * @return $this
-     */
-    public function showAllErrors($show = true)
-    {
-        $this->errorsShowAll = $show;
-        return $this;
-    }
-
-    /**
-     * Bung!
-     * @return bool
-     */
-    public function showLatestErrorOnly()
-    {
-        return !$this->errorsShowAll;
     }
 
     /**
@@ -426,11 +417,7 @@ class Element
 
                 $errorsHtml = '<ul class="error-list">';
                 foreach ($errors as $error) {
-
                     $errorsHtml .= sprintf('<li>%s</li>', $error);
-                    if ($element->showLatestErrorOnly()) {
-                        break;
-                    }
                 }
                 $errorsHtml .= '</ul>';
             }
@@ -453,7 +440,7 @@ class Element
             str_replace('_', '-', (is_object($element->form) ? $element->form->getName():'form') ),
             ($type == 'checkbox' ? $fieldHtml : $labelHtml), //swap these around for checkbox fields
             ($type == 'checkbox' ? $labelHtml : $fieldHtml),
-            $errorsHtml,
+            ($element->hideErrors ? '' : $errorsHtml),
             $wrapper
         );
     }

@@ -38,7 +38,6 @@ abstract class Form
     protected $csrf;
 
     protected $displayInlineErrors = true;
-    protected $displayAllInlineErrors = false;
     protected $hideElementLabels = false;
 
     protected $formIsValid = null;
@@ -183,21 +182,20 @@ abstract class Form
     }
 
     /**
-     * @param bool $all
+     * Display inline errors
      * @return $this
      */
-    public function showErrors($all = false)
+    public function showInlineErrors()
     {
         $this->displayInlineErrors = true;
-        $this->displayAllInlineErrors = $all;
         return $this;
     }
 
     /**
-     * Hide errors
+     * Hide inline errors
      * @return $this
      */
-    public function hideErrors()
+    public function hideInlineErrors()
     {
         $this->displayInlineErrors = false;
         return $this;
@@ -281,7 +279,7 @@ abstract class Form
         //add form elements/fields
         foreach ($this->elements as $element) {
             $element->hideLabel($this->hideElementLabels);
-            $element->showAllErrors($this->displayAllInlineErrors);
+            $element->displayErrors($this->displayInlineErrors);
             $formHtml .= $element->render('all', $this->elementWrapper);
         }
 
@@ -406,7 +404,7 @@ abstract class Form
 
             $elementErrors = $element->getErrors(false);
             if (!empty($elementErrors)) {
-                $errors[$name] = ($all ? $elementErrors : current($elementErrors));
+                $errors[$element->getLabel(false)] = ($all ? $elementErrors : current($elementErrors));
             }
         }
 
