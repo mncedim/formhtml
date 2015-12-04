@@ -66,49 +66,49 @@ class Element
         'label'
             => '<label for="{{id}}">{{text}}</label>',
         'text'
-            => '<input type="text" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{extra}} />',
+            => '<input type="text" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{attributes}} />',
         'password'
-            => '<input type="password" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{extra}} />',
+            => '<input type="password" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{attributes}} />',
         'email'
-            => '<input type="email" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{extra}} />',
+            => '<input type="email" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{attributes}} />',
         'textarea'
-            => '<textarea name="{{name}}" id="{{id}}" class="{{class}}" {{extra}}>{{value}}</textarea>',
+            => '<textarea name="{{name}}" id="{{id}}" class="{{class}}" {{attributes}}>{{value}}</textarea>',
         'select'
-            => '<select name="{{name}}" id="{{id}}" class="{{class}}" {{extra}}>{{value}}</select>',
+            => '<select name="{{name}}" id="{{id}}" class="{{class}}" {{attributes}}>{{value}}</select>',
         'checkbox'
-            => '<input type="checkbox" name="{{name}}" id="{{id}}" class="{{class}}" {{value}} {{extra}} />',
+            => '<input type="checkbox" name="{{name}}" id="{{id}}" class="{{class}}" {{value}} {{attributes}} />',
         'radio'
-            => '<input type="radio" name="{{name}}" id="{{id}}" class="{{class}}" {{value}} {{extra}} />',
+            => '<input type="radio" name="{{name}}" id="{{id}}" class="{{class}}" {{value}} {{attributes}} />',
         'hidden'
-            => '<input type="hidden" name="{{name}}" id="{{id}}" class="{{class}}" {{extra}} value="{{value}}" />',
+            => '<input type="hidden" name="{{name}}" id="{{id}}" class="{{class}}" {{attributes}} value="{{value}}" />',
         'file'
-            => '<input type="file" name="{{name}}" id="{{id}}" class="{{class}}" {{extra}}/>{{value}}',
+            => '<input type="file" name="{{name}}" id="{{id}}" class="{{class}}" {{attributes}}/>{{value}}',
         'url'
-            => '<input type="url" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{extra}} />',
+            => '<input type="url" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{attributes}} />',
         'number'
-            => '<input type="number" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{extra}} />',
+            => '<input type="number" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{attributes}} />',
         'submit'
-            => '<input type="submit" value="{{value}}" class="{{class}}" {{extra}} />',
+            => '<input type="submit" value="{{value}}" class="{{class}}" {{attributes}} />',
         'multicheckbox'
             => '', //doesn't have its own uses the checkbox template multiple times
         'range'
-            => '<input type="range" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{extra}} />',
+            => '<input type="range" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{attributes}} />',
         'search'
-            => '<input type="search" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{extra}} />',
+            => '<input type="search" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{attributes}} />',
         'output'
-            => '<output name="{{name}}" id="{{id}}" {{extra}} >{{value}}</output>',
+            => '<output name="{{name}}" id="{{id}}" {{attributes}} >{{value}}</output>',
         'optgroup'
             => '<optgroup label="{{label}}">{{options}}</optgroup>',
         'date'
-            => '<input type="date" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{extra}} />',
+            => '<input type="date" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{attributes}} />',
         'datetime_local'
-            => '<input type="datetime-local" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{extra}} />',
+            => '<input type="datetime-local" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{attributes}} />',
         'time'
-            => '<input type="time" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{extra}} />',
+            => '<input type="time" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{attributes}} />',
         'week'
-            => '<input type="week" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{extra}} />',
+            => '<input type="week" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{attributes}} />',
         'month'
-            => '<input type="month" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{extra}} />'
+            => '<input type="month" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{attributes}} />'
     );
 
 
@@ -124,6 +124,9 @@ class Element
         $this->type = $type;
         $this->name = $name;
         $this->properties = $properties;
+        if (isset($properties['extra'])) {
+            $this->properties['attributes'] = $properties['extra'];
+        }
         $this->form = $form;
 
         if ($type == 'checkbox' && !isset($properties['value'])) {
@@ -177,9 +180,9 @@ class Element
     public function addAttribute($attribute, $value = null)
     {
         if (!is_null($value)) {
-            $this->properties['extra'][$attribute] = $value;
+            $this->properties['attributes'][$attribute] = $value;
         } else {
-            $this->properties['extra'][] = $attribute;
+            $this->properties['attributes'][] = $attribute;
         }
     }
 
@@ -469,11 +472,11 @@ class Element
         }
         $fieldHtml = str_replace('{{class}}', implode(' ', $class), $fieldHtml);
 
-        //extra attributes if any
-        $extra = $element->getProperties('extra');
+        //attributes attributes if any
+        $attributes = $element->getProperties('attributes');
         $extraAttributes = '';
-        if (is_array($extra)) {
-            foreach ($extra as $attr => $val) {
+        if (is_array($attributes)) {
+            foreach ($attributes as $attr => $val) {
                 if (is_string($attr)) {
                     $extraAttributes .= sprintf('%s="%s" ', $attr, $val);
                 } else {
@@ -482,7 +485,7 @@ class Element
             }
         }
 
-        $fieldHtml = str_replace('{{extra}}', $extraAttributes, $fieldHtml);
+        $fieldHtml = str_replace('{{attributes}}', $extraAttributes, $fieldHtml);
     }
 
     /**
@@ -525,7 +528,7 @@ class Element
     {
         $value = $element->getValue();
         $options = $element->getProperties('options');
-        $extra = $element->getProperties('extra');
+        $attributes = $element->getProperties('attributes');
 
         if (!is_array($options)) {
             throw new \Exception("Options for field type '{$element->getType()}' must be given as array.");
@@ -536,7 +539,7 @@ class Element
             $value = array($value);
         }
 
-        if (isset($extra['multiple'])) {
+        if (isset($attributes['multiple'])) {
             $fieldHtml = str_replace('{{name}}', "{$element->getName()}[]", $fieldHtml);
         }
 
@@ -601,10 +604,10 @@ class Element
             $class = array();
         }
 
-        $extra = $element->getProperties('extra');
+        $attributes = $element->getProperties('attributes');
         $extraAttributes = '';
-        if (is_array($extra)) {
-            foreach ($extra as $attr => $val) {
+        if (is_array($attributes)) {
+            foreach ($attributes as $attr => $val) {
                 if (is_string($attr)) {
                     $extraAttributes .= sprintf('%s="%s" ', $attr, $val);
                 } else {
@@ -640,7 +643,7 @@ class Element
 
             $field = str_replace('{{id}}', "{$id}_{$option}", $field);
             $field = str_replace('{{class}}', implode(' ', $class), $field);
-            $field = str_replace('{{extra}}', $extraAttributes, $field);
+            $field = str_replace('{{attributes}}', $extraAttributes, $field);
             $field .= ' '.$labelHtml;
 
             $options[$option] = "<div>$field</div>";

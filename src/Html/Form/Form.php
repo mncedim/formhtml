@@ -95,17 +95,17 @@ abstract class Form
     /**
      * @param $name - Name of the field
      * @param string $type - Type of the field
-     * @param array $properties - [label|value|class|extra]
+     * @param array $properties - [label|value|class|attributes]
      * addField(
      *  'field_name', 'text', array(
      *      'label' => 'Field Name',
      *      'value' => 'default value',
      *      'class' => array('class'),
-     *      'extra' => array('placeholder' => 'Field Name', 'data-variable' => 'my data variable value'),
+     *      'attributes' => array('placeholder' => 'Field Name', 'data-variable' => 'my data variable value'),
      *      'options => array('value' => 'Label') //for multi valued field types like select
      *  )
      * )
-     * Note: 'extra' should be given an array of valid attributes of the element like the above placeholder eg.
+     * Note: 'attributes' should be given an array of valid attributes of the element like the above placeholder eg.
      * @return $this
      */
     public function addField($name, $type = 'text', array $properties = array())

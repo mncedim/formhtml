@@ -32,12 +32,12 @@ $inlineForm->addField('name', 'text',
     array(
         'label' => 'Your Name',
         'class' => ['class1', 'class2'],
-        'extra' => ['required', 'title' => 'Your Name', 'placeholder' => '...']
+        'attributes' => ['required', 'title' => 'Your Name', 'placeholder' => '...']
     )
 )->addField('gender', 'radio',
     array(
         'options' => ['m' => 'Male', 'f' => 'Female'],
-        'extra' => ['required']
+        'attributes' => ['required']
     )
 )->addField('favourite_sport', 'select',
     array(
@@ -47,7 +47,7 @@ $inlineForm->addField('name', 'text',
 )->addField('terms', 'checkbox',
     array(
         'label' => 'I agree with the terms and conditions.',
-        'extra' => ['required']
+        'attributes' => ['required']
     )
 );
 

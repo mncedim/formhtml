@@ -19,18 +19,18 @@ class DemoForm extends Form
             array(
                 'label' => 'Your Name',
                 'class' => ['class1', 'class2'],
-                'extra' => ['required', 'title' => 'Your Name', 'placeholder' => '...']
+                'attributes' => ['required', 'title' => 'Your Name', 'placeholder' => '...']
             )
         )->addField('gender', 'radio',
             array(
                 'options' => ['m' => 'Male', 'f' => 'Female'],
-                'extra' => ['required']
+                'attributes' => ['required']
             )
         )->addField(
             'bio', 'textarea',
             array(
                 'label' => 'Bio',
-                'extra' => array('cols' => 25, 'rows' => 3),
+                'attributes' => array('cols' => 25, 'rows' => 3),
                 'class' => array('form-control')
             )
         )->addField(
@@ -58,7 +58,7 @@ class DemoForm extends Form
         )->addField('terms', 'checkbox',
             array(
                 'label' => 'I agree with the terms and conditions.',
-                'extra' => ['required']
+                'attributes' => ['required']
             )
         )->addField(
             'save', 'submit', ['value' => 'Submit']
