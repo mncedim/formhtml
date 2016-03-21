@@ -1,0 +1,25 @@
+<h2>
+    This is a test.
+</h2>
+
+<div>
+    <h2>Form</h2>
+    {{ mncedim_form_open(form) }}
+
+    {{ mncedim_form_field_element(form.fields.name,'element-classes',{'style':'color:red;','placeholder':'Your name'}) }}
+    {{ mncedim_form_field_label(form.fields.name) }}
+
+    {{ mncedim_form_field(form.fields.gender) }}
+
+
+    {{ mncedim_form_field_label(form.fields.bio) }}<br/>
+    {{ mncedim_form_field_element(form.fields.bio) }}
+
+    <br/>
+    {{ mncedim_form_field_label(form.fields.communication) }}<br/>
+    {{ mncedim_form_field_element(form.fields.communication) }}
+
+    <br/><br/>
+    {{ mncedim_form_field(form.fields.save) }}
+    {{ mncedim_form_close(form) }}
+</div>
