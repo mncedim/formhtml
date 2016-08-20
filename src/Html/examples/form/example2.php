@@ -17,6 +17,18 @@ session_start();
  */
 $form = new DemoForm();
 
+$form->getFields('favourite_colours')->addOption('yellow')->removeOption('blue');
+$form->getFields('bio')->removeAttribute('rows')->addAttribute('rows', 10);
+$form->getFields('name')->removeAttribute('required')->removeClass('class1');
+$form->getFields('communication')->addOption('Type', ['one' => 'One', 'two' => 'Two'])->removeOption('Other');
+
+//add button before the save button
+$form->addField('text_button', 'button', array('value' => 'Click Me'), 'save')
+    ->getFields('text_button')
+    ->addAttribute('type', 'button')
+    ->addClass('btn')
+    ->addClass('btn-primary');
+
 //handle POST
 if ( isset( $_POST[$form->getName()] ) ) {
 

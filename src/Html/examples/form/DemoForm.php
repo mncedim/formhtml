@@ -37,7 +37,15 @@ class DemoForm extends Form
             'favourite_colours', 'multicheckbox',
             array(
                 'value' => array('green', 'orange'),
-                'options' => array('red' => 'Red', 'orange' => 'Orange', 'green' => 'Green', 'blue' => 'Blue')
+                'options' => array(
+                    'red' => [
+                        'label' => 'Red',
+                        'attributes' => ['title' => 'This is my custom title', 'disabled']
+                    ],
+                    'orange' => 'Orange',
+                    'green' => 'Green',
+                    'blue' => 'Blue'
+                )
             )
         )->addField(
             'communication', 'select',

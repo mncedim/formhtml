@@ -89,6 +89,8 @@ class Element
             => '<input type="number" name="{{name}}" id="{{id}}" value="{{value}}" class="{{class}}" {{attributes}} />',
         'submit'
             => '<input type="submit" value="{{value}}" class="{{class}}" {{attributes}} />',
+        'button'
+            => '<button class="{{class}}" {{attributes}}>{{value}}</button>',
         'multicheckbox'
             => '', //doesn't have its own uses the checkbox template multiple times
         'range'
@@ -139,7 +141,7 @@ class Element
     /**
      * Set value
      * @param $value
-     * @return $this
+     * @return Element $this
      */
     public function setValue($value)
     {
@@ -153,17 +155,18 @@ class Element
     }
 
     /**
-     * Set Label
      * @param $label
+     * @return Element $this
      */
     public function setLabel($label)
     {
         $this->properties['label'] = $label;
+        return $this;
     }
 
     /**
-     * Add css class
      * @param $cssClass
+     * @return Element $this
      */
     public function addClass($cssClass)
     {
@@ -171,11 +174,28 @@ class Element
             $this->properties['class'] = array();
         }
         $this->properties['class'][] = $cssClass;
+
+        return $this;
+    }
+
+    /**
+     * @param $cssClass
+     * @return Element $this
+     */
+    public function removeClass($cssClass)
+    {
+        if (is_array($this->properties['class'])
+            && false !== $index = array_search($cssClass, $this->properties['class'])) {
+
+            unset($this->properties['class'][$index]);
+        }
+        return $this;
     }
 
     /**
      * @param $attribute
      * @param null $value
+     * @return Element $this
      */
     public function addAttribute($attribute, $value = null)
     {
@@ -184,6 +204,60 @@ class Element
         } else {
             $this->properties['attributes'][] = $attribute;
         }
+
+        return $this;
+    }
+
+    /**
+     * @param $attribute
+     * @return Element $this
+     */
+    public function removeAttribute($attribute)
+    {
+        if ($this->properties['attributes'][$attribute]) {
+
+            unset($this->properties['attributes'][$attribute]);
+        } else if (false !== $index = array_search($attribute, $this->properties['attributes'])) {
+
+            unset($this->properties['attributes'][$index]);
+        }
+        return $this;
+    }
+
+    /**
+     * @param $value
+     * @param null $label
+     * @return Element $this
+     */
+    public function addOption($value, $label = null)
+    {
+        if ($this->getProperties('options')) {
+            if (is_null($label)) {
+                $label = ucwords($value);
+            }
+            $this->properties['options'][$value] = $label;
+        }
+        return $this;
+    }
+
+    /**
+     * @param $value
+     * @return Element $this
+     */
+    public function removeOption($value)
+    {
+        if ($this->getProperties('options') && isset($this->properties['options'][$value])) {
+
+            if (in_array($this->getType(), array('select', 'radio')) && $value != $this->getValue()
+                || is_array($this->getValue()) && !in_array($value, $this->getValue())) {
+
+                unset($this->properties['options'][$value]);
+            } else {
+
+                //ignore or maybe throw an exception...?
+            }
+        }
+        return $this;
     }
 
     /**
@@ -433,7 +507,7 @@ class Element
         //all together now!
         $html = '<%6$s id="%1$s_wrapper" class="%2$s-element"> %3$s %4$s %5$s </%6$s>';
 
-        if ($element->labelHidden() || in_array($element->getType(), array('hidden', 'submit'))) {
+        if ($element->labelHidden() || in_array($element->getType(), array('hidden', 'submit', 'button'))) {
             $labelHtml = ''; //label not required/wanted
         }
 
@@ -618,6 +692,30 @@ class Element
 
         foreach ($options as $option => $lbl) {
 
+            $optionAttributes = $extraAttributes;
+
+            //does this option have its own settings?
+            if (is_array($lbl)) {
+
+                $optionSettings = $lbl;
+                if (!isset($optionSettings['label'])) {
+                    throw new \Exception(
+                        "A label has not been set for one of the arrayed options for field - ".$element->getName(true)
+                    );
+                }
+
+                $lbl = $optionSettings['label'];
+                if (isset($optionSettings['attributes']) && is_array($optionSettings['attributes'])) {
+                    foreach ($optionSettings['attributes'] as $attr => $val) {
+                        if (is_string($attr)) {
+                            $optionAttributes .= sprintf('%s="%s" ', $attr, $val);
+                        } else {
+                            $optionAttributes .= sprintf('%s ', $val);
+                        }
+                    }
+                }
+            }
+
             $labelHtml = self::$templates['label'];
             $labelHtml = str_replace('{{id}}', "{$id}_{$option}", $labelHtml);
             $labelHtml = str_replace('{{text}}', $lbl, $labelHtml);
@@ -643,13 +741,13 @@ class Element
 
             $field = str_replace('{{id}}', "{$id}_{$option}", $field);
             $field = str_replace('{{class}}', implode(' ', $class), $field);
-            $field = str_replace('{{attributes}}', $extraAttributes, $field);
+            $field = str_replace('{{attributes}}', $optionAttributes, $field);
             $field .= ' '.$labelHtml;
 
             $options[$option] = "<div>$field</div>";
         }
 
-        $fieldHtml = implode('', $options);
+        $fieldHtml = '<div>'.implode('', $options).'</div>';
     }
 
     /**

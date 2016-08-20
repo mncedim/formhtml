@@ -96,6 +96,7 @@ abstract class Form
      * @param $name - Name of the field
      * @param string $type - Type of the field
      * @param array $properties - [label|value|class|attributes]
+     * @param string $before - inserts the field before the given existing field name
      * addField(
      *  'field_name', 'text', array(
      *      'label' => 'Field Name',
@@ -108,9 +109,24 @@ abstract class Form
      * Note: 'attributes' should be given an array of valid attributes of the element like the above placeholder eg.
      * @return $this
      */
-    public function addField($name, $type = 'text', array $properties = array())
+    public function addField($name, $type = 'text', array $properties = array(), $before = null)
     {
-        $this->elements[$name] = new Element($name, $type, $properties, $this);
+        if (!is_null($before) && $this->elements[$before]) {
+
+            $elements = array(); //newly ordered
+            foreach ($this->elements as $n => $e) {
+
+                if ($n == $before) {
+                    //insert the new field
+                    $elements[$name] = new Element($name, $type, $properties, $this);
+                }
+                $elements[$n] = $e;
+            }
+            $this->elements = $elements;
+        } else {
+            //default
+            $this->elements[$name] = new Element($name, $type, $properties, $this);
+        }
 
         if ($type == 'file' && !isset($this->attributes['enctype'])) {
             $this->attributes['enctype'] = 'multipart/form-data';
