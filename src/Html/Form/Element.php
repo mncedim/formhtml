@@ -381,7 +381,7 @@ class Element
      */
     public function labelHidden()
     {
-        return $this->hideLabel;
+        return $this->hideLabel || $this->getLabel(false) === false;
     }
 
     /**
@@ -436,6 +436,16 @@ class Element
             return $this->form->validate($this->getName(true), $this->getValue());
         }
         return null;
+    }
+
+    /**
+     * Add or override an Element template
+     * @param $type
+     * @param $template
+     */
+    public static function addTemplate($type, $template)
+    {
+        self::$templates[$type] = $template;
     }
 
     /**

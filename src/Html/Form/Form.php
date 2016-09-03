@@ -42,6 +42,8 @@ abstract class Form
 
     protected $formIsValid = null;
 
+    protected $elementBuildingClass = 'Mncedim\Html\Form\Element';
+
     /**
      * @param string $action
      * @param string $method
@@ -56,6 +58,14 @@ abstract class Form
         //token
         $this->csrf = new CSRF();
         $this->generateCSRFToken(false, true); //to be populated by request
+    }
+
+    /**
+     * @param $className
+     */
+    public function setCustomElementBuilder($className)
+    {
+        $this->elementBuildingClass = $className;
     }
 
     /**
@@ -118,14 +128,14 @@ abstract class Form
 
                 if ($n == $before) {
                     //insert the new field
-                    $elements[$name] = new Element($name, $type, $properties, $this);
+                    $elements[$name] = new $this->elementBuildingClass($name, $type, $properties, $this);
                 }
                 $elements[$n] = $e;
             }
             $this->elements = $elements;
         } else {
             //default
-            $this->elements[$name] = new Element($name, $type, $properties, $this);
+            $this->elements[$name] = new $this->elementBuildingClass($name, $type, $properties, $this);
         }
 
         if ($type == 'file' && !isset($this->attributes['enctype'])) {
