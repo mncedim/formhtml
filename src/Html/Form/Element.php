@@ -14,6 +14,30 @@ namespace Mncedim\Html\Form;
  */
 class Element
 {
+
+    const TYPE_TEXT             = 'text';
+    const TYPE_PASSWORD         = 'password';
+    const TYPE_TEXTAREA         = 'textarea';
+    const TYPE_CHECKBOX         = 'checkbox';
+    const TYPE_RADIO            = 'radio';
+    const TYPE_SELECT           = 'select';
+    const TYPE_SUBMIT           = 'submit';
+    const TYPE_BUTTON           = 'button';
+    const TYPE_FILE             = 'file';
+    const TYPE_MULTICHECKBOX    = 'multicheckbox';
+    const TYPE_HIDDEN           = 'hidden';
+    const TYPE_EMAIL            = 'email';
+    const TYPE_NUMBER           = 'number';
+    const TYPE_DATE             = 'date';
+    const TYPE_TIME             = 'time';
+    const TYPE_WEEK             = 'week';
+    const TYPE_MONTH            = 'month';
+    const TYPE_DATETIME_LOCAL   = 'datetime_local';
+    const TYPE_RANGE            = 'range';
+    const TYPE_SEARCH           = 'search';
+    const TYPE_OUTPUT           = 'output';
+    const TYPE_URL              = 'url';
+
     /**
      * Name of the element
      * @var string
@@ -131,7 +155,7 @@ class Element
         }
         $this->form = $form;
 
-        if ($type == 'checkbox' && !isset($properties['value'])) {
+        if ($type == self::TYPE_CHECKBOX && !isset($properties['value'])) {
             //default checkboxes to false so that if they get unchecked in a form and don't get
             //submitted back, they will remain false which is the goal of un-checking them
             $this->properties['value'] = 0;
@@ -145,7 +169,7 @@ class Element
      */
     public function setValue($value)
     {
-        if ($this->type == 'checkbox' && (int)$value != 1) {
+        if ($this->type == self::TYPE_CHECKBOX && (int)$value != 1) {
             //default everything that is not 1 to false
             $value = 0;
         }
@@ -248,7 +272,7 @@ class Element
     {
         if ($this->getProperties('options') && isset($this->properties['options'][$value])) {
 
-            if (in_array($this->getType(), array('select', 'radio')) && $value != $this->getValue()
+            if (in_array($this->getType(), array(self::TYPE_SELECT, self::TYPE_RADIO)) && $value != $this->getValue()
                 || is_array($this->getValue()) && !in_array($value, $this->getValue())) {
 
                 unset($this->properties['options'][$value]);
@@ -310,7 +334,7 @@ class Element
         if (is_object($this->form) && !$text) {
 
             //do not give a file element type an array name
-            return $this->type == 'file' ?
+            return $this->type == self::TYPE_FILE ?
                 $this->getFormFileName() : "{$this->form->getName()}[$this->name]";
         }
 
@@ -323,7 +347,7 @@ class Element
      */
     public function getFormFileName()
     {
-        if ($this->getType() != 'file' || !is_object($this->form)) {
+        if ($this->getType() != self::TYPE_FILE || !is_object($this->form)) {
             return null;
         }
         return $this->form->getName() . '_' . $this->name;
@@ -490,7 +514,7 @@ class Element
             }
 
             //the hidden field type should never need the stuff below, might as well return here
-			if ($part == 'field' || $element->getType() == 'hidden') {
+			if ($part == 'field' || $element->getType() == self::TYPE_HIDDEN) {
                 return $fieldHtml;
             }
 		}
@@ -515,9 +539,11 @@ class Element
         }
 
         //all together now!
-        $html = '<%6$s id="%1$s_wrapper" class="%2$s-element"> %3$s %4$s %5$s </%6$s>';
+        $html = '<%6$s id="%1$s_wrapper" class="%2$s-element mncedim-form-element"> %3$s %4$s %5$s </%6$s>';
 
-        if ($element->labelHidden() || in_array($element->getType(), array('hidden', 'submit', 'button'))) {
+        if ($element->labelHidden() ||
+            in_array($element->getType(), array(self::TYPE_HIDDEN, self::TYPE_SUBMIT, self::TYPE_BUTTON))) {
+
             $labelHtml = ''; //label not required/wanted
         }
 
@@ -525,8 +551,8 @@ class Element
             $html,
             $id,
             str_replace('_', '-', (is_object($element->form) ? $element->form->getName():'form') ),
-            ($type == 'checkbox' ? $fieldHtml : $labelHtml), //swap these around for checkbox fields
-            ($type == 'checkbox' ? $labelHtml : $fieldHtml),
+            ($type == self::TYPE_CHECKBOX ? $fieldHtml : $labelHtml), //swap these around for checkbox fields
+            ($type == self::TYPE_CHECKBOX ? $labelHtml : $fieldHtml),
             ($element->hideErrors ? '' : $errorsHtml),
             $wrapper
         );
@@ -673,7 +699,7 @@ class Element
         $id = $element->getId();
 
         $value = $element->getValue();
-        if ($element->getType() == 'multicheckbox' && !is_array($value)) {
+        if ($element->getType() == self::TYPE_MULTICHECKBOX && !is_array($value)) {
             $value = array();
         }
 
@@ -730,17 +756,17 @@ class Element
             $labelHtml = str_replace('{{id}}', "{$id}_{$option}", $labelHtml);
             $labelHtml = str_replace('{{text}}', $lbl, $labelHtml);
 
-            if ($element->getType() == 'radio') {
+            if ($element->getType() == self::TYPE_RADIO) {
 
-                $field = self::$templates['radio'];
+                $field = self::$templates[self::TYPE_RADIO];
                 $field = str_replace('{{name}}', $name, $field);
                 $field = str_replace(
                     '{{value}}', ( 'value="'.$option.'" ' . ($option == $value ? ' checked="checked"':'') ), $field
                 );
 
-            } else if ($element->getType() == 'multicheckbox') {
+            } else if ($element->getType() == self::TYPE_MULTICHECKBOX) {
 
-                $field = self::$templates['checkbox'];
+                $field = self::$templates[self::TYPE_CHECKBOX];
                 $field = str_replace('{{name}}', "{$name}[]", $field);
                 $field = str_replace(
                     '{{value}}',
